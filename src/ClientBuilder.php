@@ -9,9 +9,11 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Smpp\Configs\SmppConfig;
 use Smpp\Configs\SocketTransportConfig;
+use Smpp\Configs\StreamTransportConfig;
 use Smpp\Contracts\Transport\TransportInterface;
 use Smpp\Transport\SCTPTransport;
 use Smpp\Transport\SocketTransport;
+use Smpp\Transport\StreamTransport;
 use Smpp\Utils\Network\DSNParser;
 
 class ClientBuilder
@@ -82,6 +84,27 @@ class ClientBuilder
 
         return $self;
     }
+
+    /**
+     * @param string[] $dsnEntries
+     * @param StreamTransportConfig|null $config
+     *
+     * @return static
+     * @throws Exceptions\SmppInvalidArgumentException
+     */
+    public static function createForStream(array $dsnEntries, StreamTransportConfig $config = null): static
+    {
+        $self = new static();
+
+        if (!isset($config)) {
+            $config = new StreamTransportConfig();
+        }
+
+        $self->transport = new StreamTransport(DSNParser::parseDSNEntries(...$dsnEntries), $config);
+
+        return $self;
+    }
+
 
     /**
      * @param LoggerInterface $logger

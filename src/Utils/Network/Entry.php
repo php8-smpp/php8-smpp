@@ -21,6 +21,7 @@ class Entry
         private int $port,
         private ?string $ipv4 = null,
         private ?string $ipv6 = null,
+        private ?string $host = null,
 
     )
     {
@@ -56,4 +57,12 @@ class Entry
     {
         return $this->port;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getHost(): string
+    {
+        return $this->host;
+    }    
 }
