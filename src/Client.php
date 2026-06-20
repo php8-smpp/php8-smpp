@@ -254,6 +254,7 @@ class Client implements SmppClientInterface
         // Read PDUs until the one we are looking for shows up, or a generic nack pdu with matching sequence or null sequence
         do {
             $pdu = $this->readPDU();
+
             if ($pdu) {
                 if ($this->isExpectedResponse($pdu, $sequenceNumber, $commandID)) {
                     return $pdu;
@@ -288,6 +289,7 @@ class Client implements SmppClientInterface
         // Read PDU header
         $bufHeaders = $this->transport->read(PDUHeader::PDU_HEADER_LENGTH);
         if ($bufHeaders === "") {
+            $this->logger->debug('readPDU: empty buffer headers');
             return false;
         }
 

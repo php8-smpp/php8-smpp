@@ -42,7 +42,7 @@ class Resolver
         if (empty($ipv4List) && empty($ipv6List)) {
             $ip = gethostbyname($host);
             if ($ip !== $host) {
-                yield self::createFallbackEntry($ip, $port);
+                yield self::createFallbackEntry($ip, $port, host: $host);
             }
             return;
         }
@@ -52,18 +52,19 @@ class Resolver
             yield new Entry(
                 port: $port,
                 ipv4: array_shift($ipv4List),
-                ipv6: array_shift($ipv6List)
+                ipv6: array_shift($ipv6List),
+                host: $host,
             );
         }
 
         // Remaining IPv4 addresses
         foreach ($ipv4List as $ipv4) {
-            yield new Entry(port: $port, ipv4: $ipv4);
+            yield new Entry(port: $port, ipv4: $ipv4, host: $host);
         }
 
         // Remaining IPv6 addresses
         foreach ($ipv6List as $ipv6) {
-            yield new Entry(port: $port, ipv6: $ipv6);
+            yield new Entry(port: $port, ipv6: $ipv6, host: $host);
         }
     }
 
@@ -76,11 +77,11 @@ class Resolver
      * @return Entry
      * @throws SmppInvalidArgumentException
      */
-    public static function createFallbackEntry(string $ip, int $port): Entry
+    public static function createFallbackEntry(string $ip, int $port, ?string $host = null): Entry
     {
         return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)
-            ? new Entry(port: $port, ipv6: $ip)
-            : new Entry(port: $port, ipv4: $ip);
+            ? new Entry(port: $port, ipv6: $ip, host: $host)
+            : new Entry(port: $port, ipv4: $ip, host: $host);
     }
 
     /**
