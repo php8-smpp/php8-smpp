@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Smpp\Pdu;
 
 use Smpp\Exceptions\SmppInvalidArgumentException;
+use ValueError;
 
 /**
  * Primitive class to represent SMPP optional params,
@@ -112,15 +113,14 @@ class Tag
      */
     public function getBinary(): string
     {
-        $binary = pack('nn' . $this->type, $this->id, $this->length, $this->value);
-        if (!$binary) {
+        try {
+            return pack('nn' . $this->type, $this->id, $this->length, $this->value);
+        } catch (ValueError $e) {
             throw new SmppInvalidArgumentException(
-                'Format string contain errors, please check format: "'
-                . 'nn'
-                . $this->type
-                . '"'
+                'Format string contain errors, please check format: "nn' . $this->type . '"',
+                0,
+                $e
             );
         }
-        return $binary;
     }
 }
